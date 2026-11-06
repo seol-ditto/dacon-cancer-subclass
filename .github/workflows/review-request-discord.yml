@@ -11,15 +11,24 @@ jobs:
       - name: Send to Discord
         env:
           WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          ID_MAP: ${{ vars.DISCORD_ID_MAP }}
           REQUESTER: ${{ github.actor }}
           REVIEWER: ${{ github.event.requested_reviewer.login }}
           PR_TITLE: ${{ github.event.pull_request.title }}
           PR_NUM: ${{ github.event.pull_request.number }}
           PR_URL: ${{ github.event.pull_request.html_url }}
         run: |
+          DID=$(echo "$ID_MAP" | jq -r --arg u "$REVIEWER" '.[$u] // empty')
+          if [ -n "$DID" ]; then
+            MENTION="<@$DID>"
+          else
+            MENTION="$REVIEWER"
+          fi
+
           jq -n \
-            --arg t "🔁 리뷰 요청: #$PR_NUM $PR_TITLE" \
-            --arg d "$REQUESTER 님이 $REVIEWER 님에게 리뷰를 요청했어요" \
+            --arg c "$MENTION 리뷰 요청이 왔어요!" \
+            --arg t "🔁 #$PR_NUM $PR_TITLE" \
+            --arg d "$REQUESTER 님이 리뷰를 요청했어요" \
             --arg u "$PR_URL" \
-            '{embeds:[{title:$t, description:$d, url:$u, color:16753920}]}' \
+            '{content:$c, allowed_mentions:{parse:["users"]}, embeds:[{title:$t, description:$d, url:$u, color:16753920}]}' \
           | curl -s -H "Content-Type: application/json" -d @- "$WEBHOOK"
