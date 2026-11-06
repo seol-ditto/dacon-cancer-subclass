@@ -54,6 +54,7 @@
 ---
 
 # 실험 결과
+[실험 기록표](https://docs.google.com/spreadsheets/d/1cfUcgF3V7Kw16Vt3tZxV04qgElGCalMTkMXN9T6LZ7k/edit?gid=0#gid=0)
 
 | 모델 | CV Score | LB Score |
 |---|---|---|

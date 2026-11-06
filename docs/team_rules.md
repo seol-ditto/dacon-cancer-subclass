@@ -65,3 +65,76 @@ feature/작업-내용
 - `exp`, `submit` 커밋에는 점수(CV, LB)를 같이 적으면 나중에 어떤 버전이 좋았는지 찾기 쉽습니다.
   - 예: `⚗️ exp: XGBoost depth 6 (CV 0.xxx)`
 - 커밋은 작게, 자주 합니다. 한 커밋에는 한 가지 작업만 담습니다.
+
+## 데이터 경로
+
+대회 데이터는 git에 올리지 않으므로, **각자 다운로드해서 아래 위치에 그대로 둡니다.**
+파일 이름은 바꾸지 않습니다.
+
+```
+data/
+├── train.csv
+├── test.csv
+└── sample_submission.csv
+```
+
+- 코드에서는 항상 상대 경로로 불러옵니다. 개인 컴퓨터의 절대 경로(`/Users/...`, `C:\...`)는 쓰지 않습니다.
+  ```python
+  DATA_DIR = "data"
+  train = pd.read_csv(f"{DATA_DIR}/train.csv")
+  ```
+- 노트북(`notebooks/`)에서 실행할 때는 `../data/train.csv`로 불러옵니다.
+
+## 데이터 사용 원칙 (Data Leakage 방지)
+
+- 인코더, 스케일러 등 전처리는 **train으로만 fit**하고, test에는 transform만 적용합니다.
+- test 데이터는 형식 확인과 예측에만 사용합니다. test 분포를 보고 피처를 고르거나 기준을 정하지 않습니다.
+- 임계값, 앙상블 구성 등 모든 결정은 검증 데이터(CV) 기준으로 합니다.
+
+## 검증 방식
+
+> ⚠️ 현재는 **기본안**입니다. EDA 결과(데이터 크기, 가장 적은 아형의 환자 수, 학습 시간)를 확인한 뒤 회의에서 확정합니다.
+
+팀원 간 CV 점수를 비교할 수 있도록 **모두 같은 방식으로 검증합니다.**
+
+| 항목 | 값 |
+|---|---|
+| 분할 방식 | Stratified K-Fold (SUBCLASS 기준) |
+| Fold 수 | 5 |
+| Shuffle | True |
+| Seed | 42 |
+| 평가 지표 | 대회 평가 지표와 동일 |
+
+```python
+import random
+import numpy as np
+from sklearn.model_selection import StratifiedKFold
+
+SEED = 42
+random.seed(SEED)
+np.random.seed(SEED)
+
+skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=SEED)
+for fold, (tr_idx, va_idx) in enumerate(skf.split(X, y)):
+    ...
+```
+
+- 모델에도 `random_state=SEED`(또는 `seed`, `random_seed`)를 지정합니다.
+- CV 점수는 5개 fold 점수의 평균으로 기록합니다.
+
+## 실험 기록
+
+모든 실험과 제출은 공유 실험 기록표(구글 스프레드시트)에 남깁니다.
+
+- [실험 기록표](https://docs.google.com/spreadsheets/d/1cfUcgF3V7Kw16Vt3tZxV04qgElGCalMTkMXN9T6LZ7k/edit?gid=0#gid=0)
+
+| 날짜 | 담당 | 브랜치 | 모델 | 주요 설정 | CV | LB | 메모 |
+|---|---|---|---|---|---|---|---|
+| 11/07 | 이름 | feature/lgbm-baseline | LightGBM | 원핫 인코딩, 기본 파라미터 | 0.xxx | 0.xxx | 베이스라인 |
+
+- 리더보드에 제출하지 않은 실험도 CV 점수와 함께 기록합니다.
+- 제출 파일은 `submissions/`에 아래 형식으로 저장합니다.
+  ```
+  날짜_이름_모델_CV점수.csv
+  예: 1107_seol_lgbm_0.712.csv
+  ```
