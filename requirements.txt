@@ -1,0 +1,11 @@
+# Python 3.12 (macOS는 brew install libomp 필요)
+ipykernel==7.4.0
+lightgbm==4.7.0
+matplotlib==3.11.2
+numpy==2.5.4
+optuna==5.0.0
+pandas==3.1.1
+scikit-learn==1.9.1
+seaborn==0.13.2
+shap==0.54.1
+xgboost==3.4.1
