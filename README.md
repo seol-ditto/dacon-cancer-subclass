@@ -18,7 +18,7 @@
 
 # 팀 구성
 
-| 이름 | 역할 |
+| 이름 | GitHub |
 |---|---|
 | 전은지 | 팀장 / [@ellieJ](https://github.com/ellieJ) |
 | 강선영 | [@kangkiwi](https://github.com/kangkiwi) |
