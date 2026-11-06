@@ -1,5 +1,40 @@
 # 팀 규칙
 
+## 브랜치 전략
+
+```
+main
+feature/*
+```
+
+- **main**: 최종 코드가 저장되는 브랜치입니다. 직접 push하지 않고 PR로만 병합합니다.
+- **feature/**: 개인 작업 브랜치입니다. main에서 브랜치를 만들어 작업한 뒤 commit, 이후 main으로 PR을 보냅니다.
+
+### 브랜치 이름 규칙
+
+```
+feature/작업-내용
+```
+
+- 영어 소문자와 하이픈(-)만 사용합니다.
+- 작업 내용이 한눈에 보이도록 짧게 씁니다.
+
+| 예시 | 작업 |
+|---|---|
+| `feature/eda` | 탐색적 데이터 분석 |
+| `feature/preprocessing` | 데이터 전처리 |
+| `feature/lgbm-baseline` | LightGBM 베이스라인 |
+| `feature/catboost` | CatBoost 실험 |
+| `feature/ensemble` | 앙상블 |
+
+### 작업 순서
+
+1. main 최신화: `git switch main` → `git pull`
+2. 브랜치 생성: `git switch -c feature/작업-내용`
+3. 작업 후 커밋, push: `git push -u origin feature/작업-내용`
+4. 깃허브에서 main으로 PR 생성 → 리뷰 후 병합
+5. 병합된 브랜치는 삭제합니다.
+
 ## 커밋 메시지 컨벤션
 
 ### 형식
