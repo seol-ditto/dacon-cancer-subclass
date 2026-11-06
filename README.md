@@ -25,6 +25,8 @@
 | 김설아 | [@seol-ditto](https://github.com/seol-ditto) |
 | 서민서 | @github ID fill up 예정 |
 
+- [팀 규칙 바로가기](docs/team_rules.md)
+
 ---
 
 # 데이터 설명
