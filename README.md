@@ -2,6 +2,7 @@
 
 > 데이콘 [초격차] AI 헬스케어 7기 해커톤
 > 기간: 2026.11.06 ~ 2026.11.13
+> 📌 작업 전 [팀 규칙](docs/team_rules.md)을 꼭 확인해 주세요!
 
 ---
 
@@ -24,8 +25,6 @@
 | 강선영 | [@kangkiwi](https://github.com/kangkiwi) |
 | 김설아 | [@seol-ditto](https://github.com/seol-ditto) |
 | 서민서 | @github ID fill up 예정 |
-
-- [팀 규칙 바로가기](docs/team_rules.md)
 
 ---
 
