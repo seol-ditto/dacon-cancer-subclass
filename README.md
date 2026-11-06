@@ -1,8 +1,7 @@
 # 🧬 암환자 유전체 변이 기반 암종 분류 AI 모델
 
-> 데이콘 [초격차] AI 헬스케어 7기 해커톤 (2026.11.06 ~ 2026.11.13)
-
-> 📌 작업 전 [팀 규칙](docs/team_rules.md)을 꼭 확인해 주세요!
+> 데이콘 [초격차] AI 헬스케어 7기 해커톤
+> 기간: 2026.11.06 ~ 2026.11.13
 
 ---
 
@@ -13,18 +12,18 @@
 
 - **과제**: 유전자 변이 정보 기반 암 아형(SUBCLASS) 예측
 - **문제 유형**: 다중 분류 (Multi-class Classification)
-- **평가 지표**: Macro F1 Score
+- **평가 지표**: (대회 규칙 확인 후 작성)
 
 ---
 
 # 팀 구성
 
-| 이름 | GitHub |
+| 이름 | 역할 |
 |---|---|
-| 전은지 | 팀장 / [@ellieJ](https://github.com/ellieJ) |
-| 강선영 | [@kangkiwi](https://github.com/kangkiwi) |
-| 김설아 | [@seol-ditto](https://github.com/seol-ditto) |
-| 서민서 | @github ID fill up 예정 |
+| 팀원1 | 팀장 / (역할) |
+| 팀원2 | (역할) |
+| 팀원3 | (역할) |
+| 팀원4 | (역할) |
 
 ---
 
@@ -93,14 +92,16 @@
 
 ```
 dacon-cancer-subclass/
-├── .github/             # 디스코드 알림 연동, PR 템플릿
-├── data/                # 대회 데이터 (git 제외)
+├── .github/
+│   ├── workflows/                 # 디스코드 알림 연동
+│   └── pull_request_template.md   # PR 템플릿
+├── data/                          # 대회 데이터 (git 제외)
 ├── docs/
-│   └── meetings/        # 회의록 (템플릿 포함)
-│   └── team_rules.md    # 팀 규칙 (커밋 컨벤션)
-├── notebooks/           # EDA 및 실험 노트북
-├── src/                 # 전처리 · 학습 · 예측 코드
-├── submissions/         # 제출 파일 (git 제외)
+│   ├── meetings/                  # 회의록 (템플릿 포함)
+│   └── team_rules.md              # 팀 규칙 (브랜치 전략, 커밋 컨벤션)
+├── notebooks/                     # EDA 및 실험 노트북
+├── src/                           # 전처리 · 학습 · 예측 코드
+├── submissions/                   # 제출 파일 (git 제외)
 ├── .gitignore
 ├── requirements.txt
 └── README.md
