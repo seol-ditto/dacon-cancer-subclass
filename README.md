@@ -20,10 +20,10 @@
 
 | 이름 | 역할 |
 |---|---|
-| 팀원1 | 팀장 / 전은지 |
-| 팀원2 | 강선영 |
-| 팀원3 | 김설아 |
-| 팀원4 | 서민서 |
+| 전은지 | 팀장 / [@ellieJ](https://github.com/ellieJ) |
+| 강선영 | [@kangkiwi](https://github.com/kangkiwi) |
+| 김설아 | [@seol-ditto](https://github.com/seol-ditto) |
+| 서민서 | @github ID fill up 예정 |
 
 ---
 
