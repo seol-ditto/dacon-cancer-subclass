@@ -1,7 +1,8 @@
 # 🧬 암환자 유전체 변이 기반 암종 분류 AI 모델
 
-> 데이콘 [초격차] AI 헬스케어 7기 해커톤
-> 기간: 2026.11.06 ~ 2026.11.13
+> 데이콘 [초격차] AI 헬스케어 7기 해커톤 (2026.11.06 ~ 2026.11.13)
+
+> 📌 작업 전 [팀 규칙](docs/team_rules.md)을 꼭 확인해 주세요!
 
 ---
 
@@ -12,18 +13,18 @@
 
 - **과제**: 유전자 변이 정보 기반 암 아형(SUBCLASS) 예측
 - **문제 유형**: 다중 분류 (Multi-class Classification)
-- **평가 지표**: (대회 규칙 확인 후 작성)
+- **평가 지표**: Macro F1 Score
 
 ---
 
 # 팀 구성
 
-| 이름 | 역할 |
+| 이름 | GitHub |
 |---|---|
-| 팀원1 | 팀장 / (역할) |
-| 팀원2 | (역할) |
-| 팀원3 | (역할) |
-| 팀원4 | (역할) |
+| 전은지 | 팀장 / [@ellieJ](https://github.com/ellieJ) |
+| 강선영 | [@kangkiwi](https://github.com/kangkiwi) |
+| 김설아 | [@seol-ditto](https://github.com/seol-ditto) |
+| 서민서 | @github ID fill up 예정 |
 
 ---
 
