@@ -1,0 +1,51 @@
+# ===== 대회 데이터 (외부 공개 금지) =====
+data/
+*.csv
+*.parquet
+*.zip
+
+# ===== 제출 파일 · 모델 결과물 =====
+submissions/
+outputs/
+models/
+*.pkl
+*.joblib
+*.pt
+*.pth
+*.h5
+*.cbm
+catboost_info/
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# ===== 가상환경 =====
+venv/
+.venv/
+env/
+.env
+.conda/
+
+# ===== Jupyter =====
+.ipynb_checkpoints/
+
+# ===== 로그 · 실험 기록 도구 =====
+logs/
+*.log
+wandb/
+mlruns/
+
+# ===== macOS =====
+.DS_Store
+._*
+
+# ===== Windows =====
+Thumbs.db
+desktop.ini
+
+# ===== 에디터 =====
+.vscode/
+.idea/
