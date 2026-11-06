@@ -64,7 +64,7 @@ feature/작업-내용
 
 - `exp`, `submit` 커밋에는 점수(CV, LB)를 같이 적으면 나중에 어떤 버전이 좋았는지 찾기 쉽습니다.
   - 예: `⚗️ exp: XGBoost depth 6 (CV 0.xxx)`
-- 커밋은 작게, 자주 합니다. 한 커밋에는 한 가지 작업만 담습니다.
+- 커밋은 작게, **자주** 합니다. **한 커밋에는 한 가지 작업**만 담습니다.
 
 ## 데이터 경로
 
@@ -78,14 +78,14 @@ data/
 └── sample_submission.csv
 ```
 
-- 코드에서는 항상 상대 경로로 불러옵니다. 개인 컴퓨터의 절대 경로(`/Users/...`, `C:\...`)는 쓰지 않습니다.
+- 코드에서는 항상 **상대 경로**로 불러옵니다. 개인 컴퓨터의 절대 경로(`/Users/...`, `C:\...`)는 쓰지 않습니다.
   ```python
   DATA_DIR = "data"
   train = pd.read_csv(f"{DATA_DIR}/train.csv")
   ```
 - 노트북(`notebooks/`)에서 실행할 때는 `../data/train.csv`로 불러옵니다.
 
-## 데이터 사용 원칙 (Data Leakage 방지)
+## 데이터 사용 원칙 (**Data Leakage 방지**)
 
 - 인코더, 스케일러 등 전처리는 **train으로만 fit**하고, test에는 transform만 적용합니다.
 - test 데이터는 형식 확인과 예측에만 사용합니다. test 분포를 보고 피처를 고르거나 기준을 정하지 않습니다.
@@ -103,7 +103,7 @@ data/
 | Fold 수 | 5 |
 | Shuffle | True |
 | Seed | 42 |
-| 평가 지표 | 대회 평가 지표와 동일 |
+| 평가 지표 | Macro F1 score |
 
 ```python
 import random
