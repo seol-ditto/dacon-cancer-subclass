@@ -96,7 +96,7 @@ dacon-cancer-subclass/
 ├── data/                # 대회 데이터 (git 제외)
 ├── docs/
 │   └── meetings/        # 회의록 (템플릿 포함)
-│   └── team_rules.md        # 팀 규칙 (커밋 컨벤션)
+│   └── team_rules.md    # 팀 규칙 (커밋 컨벤션)
 ├── notebooks/           # EDA 및 실험 노트북
 ├── src/                 # 전처리 · 학습 · 예측 코드
 ├── submissions/         # 제출 파일 (git 제외)
