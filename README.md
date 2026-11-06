@@ -93,7 +93,7 @@
 
 ```
 dacon-cancer-subclass/
-├── .github/workflows/   # 디스코드 알림 연동
+├── .github/             # 디스코드 알림 연동, PR 템플릿
 ├── data/                # 대회 데이터 (git 제외)
 ├── docs/
 │   └── meetings/        # 회의록 (템플릿 포함)
