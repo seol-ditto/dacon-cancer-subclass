@@ -7,11 +7,6 @@ from pathlib import Path
 # ===== 경로 =====
 # 이 파일(src/config.py) 기준으로 저장소 루트를 찾으므로, 노트북/스크립트 어디서 실행해도 같은 경로가 됩니다.
 ROOT_DIR = Path(__file__).resolve().parents[1]
-# __file__ : 현재 파일의 경로
-# .resolve() : 상대 경로를 절대 경로로 변환
-# .parents[1] : 현재 파일의 상위 2단계 디렉토리 (=저장소 루트)
-
-# Path 객체끼리는 / 기호로 경로를 이어 붙일 수 있음
 DATA_DIR = ROOT_DIR / "data"
 SUBMISSION_DIR = ROOT_DIR / "submissions"
 
