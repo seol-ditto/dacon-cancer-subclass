@@ -43,14 +43,21 @@ _FS_AA = re.compile(r"^([A-Z*]*\d+)[A-Z]?fs.*$")   # K600Nfs, K600Nfs*12
 _POS = re.compile(r"^([A-Z*]?)(\d+)(.*)$")         # (ref)(위치)(나머지)
 
 
-def load_data(normalize=True):
+def load_data(normalize=True, dedupe=True):
     """train, test, sample_submission을 불러와 전처리를 적용해 반환합니다.
 
     Parameters
     ----------
     normalize : bool
-        True(기본)면 변이 표기 통일 + 이소폼 중복 제거를 train/test 모두에 적용합니다.
+        True(기본)면 변이 표기 통일(X → *, fs 뒤 아미노산 제거)을 train/test 모두에 적용합니다.
         False는 예전 방식과 비교할 때만 사용하세요.
+    dedupe : bool
+        True(기본)면 이소폼 중복 제거도 적용합니다 (normalize=True일 때만 의미 있음).
+        - stats(변이 '개수')를 쓰는 모델 → True 권장: test 개수가 이소폼 중복으로 부풀려진 것을 바로잡음
+        - 토큰 단위 핫스팟(11)을 쓰는 모델 → False 권장
+          · 환자별 토큰을 set으로 모으면 기본 이소폼 번호(R273H 등)가 이미 들어 있어 중복 제거가 필요 없음
+          · train에서는 '진짜 다른 변이'가 합쳐져 핫스팟 후보가 사라짐
+            (10명 이상 후보 120 → 116개: LRIG1_L24V, PLEC_A2106A, APC_R876*, PIK3CA_E453K)
 
     Returns
     -------
@@ -69,9 +76,9 @@ def load_data(normalize=True):
         df[gene_cols] = df[gene_cols].replace("", WT)
 
     if normalize:
-        vocab = build_token_vocab(train[gene_cols])  # train으로만 만듦
+        vocab = build_token_vocab(train[gene_cols]) if dedupe else None  # train으로만 만듦
         for df in (train, test):  # train과 test에 같은 규칙을 같은 순서로 적용
-            df[gene_cols] = normalize_mutations(df[gene_cols], vocab)
+            df[gene_cols] = normalize_mutations(df[gene_cols], vocab, dedupe=dedupe)
 
     return train, test, submission
 
@@ -137,10 +144,24 @@ def normalize_cell(cell, known=frozenset()):
     return " ".join(t for *_, t in best.values())
 
 
-def normalize_mutations(gene_df, vocab=None):
-    """유전자 컬럼 DataFrame 전체에 normalize_cell()을 적용합니다 (WT 칸은 그대로).
+def normalize_tokens_only(cell):
+    """중복 제거 없이 토큰 표기만 통일합니다 (dedupe=False용).
+
+    >>> normalize_tokens_only('R141H R114H R234H R273H'), normalize_tokens_only('R292X R272X')
+    ('R141H R114H R234H R273H', 'R292* R272*')
+    """
+    if not isinstance(cell, str) or cell == WT:
+        return cell
+    return " ".join(normalize_token(t) for t in cell.split())
+
+
+def normalize_mutations(gene_df, vocab=None, dedupe=True):
+    """유전자 컬럼 DataFrame 전체에 정규화를 적용합니다 (WT 칸은 그대로).
 
     vocab : build_token_vocab(train) 결과. None이면 '가장 큰 번호'만 사용합니다.
+    dedupe : False면 이소폼 중복 제거 없이 표기 통일만 합니다.
     """
+    if not dedupe:
+        return gene_df.apply(lambda col: col.map(normalize_tokens_only))
     vocab = vocab or {}
     return gene_df.apply(lambda col: col.map(lambda c: normalize_cell(c, vocab.get(col.name, frozenset()))))
