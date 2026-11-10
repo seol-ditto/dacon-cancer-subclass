@@ -67,7 +67,7 @@ def mutation_type(token):
             return "silent"
         if alt in ("*", "X"):  # 'X'도 종결코돈 (보통은 load_data()에서 '*'로 바뀌어 들어옴)
             return "nonsense"
-        if ref == "*":
+        if ref in ("*", "X"):  # 앞의 X도 정지코돈 (예: X127C)
             return "stop_loss"
         return "missense"
     return "other"
