@@ -15,7 +15,7 @@ from src.config import WT
 MUT_TYPES = ["silent", "missense", "nonsense", "frameshift", "inframe_indel", "stop_loss", "other"]
 TRUNC_TYPES = {"nonsense", "frameshift"}  # 단백질이 잘리는(기능을 잃는) 변이
 
-_SNV = re.compile(r"([A-Z*])(\d+)([A-Z*])")  # G12D, R895R, R213*, *261*
+_SNV = re.compile(r"([A-Z*])(\d+)([A-Z*])")  # G12D, R895R, R213*, *261*, (R492X)
 
 
 def to_binary(df, gene_cols):
@@ -65,9 +65,9 @@ def mutation_type(token):
         ref, alt = m.group(1), m.group(3)
         if ref == alt:
             return "silent"
-        if alt == "*":
+        if alt in ("*", "X"):  # 'X'도 종결코돈 (보통은 load_data()에서 '*'로 바뀌어 들어옴)
             return "nonsense"
-        if ref == "*":
+        if ref in ("*", "X"):  # 앞의 X도 정지코돈 (예: X127C)
             return "stop_loss"
         return "missense"
     return "other"
@@ -90,8 +90,11 @@ def mutation_features(df, gene_cols):
         ② 제외 : nonsilent
         ③ 분리 : nonsilent + silent
 
-    trunc는 CV를 올리지만(+0.008) LB 효과는 없었습니다 (07 F). 선택 사항으로 사용하세요.
-    stats(변이 '개수' 피처)도 CV는 올리지만 LB에는 효과가 없었습니다 (07 노트북 참고).
+    trunc는 CV를 올리지만(+0.008) LB 효과는 없었습니다 (07 F).
+        → test는 종결코돈을 'X'로 표기해 nonsense가 trunc에서 빠져 있었음 (test trunc 1.37‰ → 수정 후 1.88‰).
+          load_data(normalize=True)로 고친 뒤 LB에서 다시 확인하세요.
+    stats(변이 '개수' 피처)는 사용하지 않는 것을 권장합니다.
+        → test는 정규화 후에도 환자당 변이 수가 train의 약 2배라서(중앙값 14 vs 28) 분포가 어긋납니다.
     """
     V = df[gene_cols].to_numpy()
     n, m = V.shape
