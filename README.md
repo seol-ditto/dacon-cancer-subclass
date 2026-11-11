@@ -163,11 +163,21 @@
   - 대회 데이터(`train.csv`, `test.csv`, `sample_submission.csv`)를 `data/` 폴더에 넣기
 
 - 모델 학습 및 예측 생성
-  - 현재는 노트북 단위로 실행 (`notebooks/` 번호 순서)
+  - 실험 과정은 노트북 단위로 실행 (`notebooks/` 번호 순서)
   - 각 노트북은 `src/validation.py`의 `run_cv`로 CV를 계산하고, `save_submission`으로 `submissions/`에 제출 파일을 저장
+  - 제출 조합 재현: `scripts/train_blend.py` (학습 → 확률 섞기 → 제출 파일 저장을 한 번에)
   ```bash
-  # 최종 모델 확정 후 재현용 노트북/스크립트 경로 기입 예정
+  python scripts/train_blend.py --list                                   # 섞기 조합(프리셋) 목록
+  python scripts/train_blend.py --preset blend14                         # 14 XGB 0.7 + LR 0.3 (--preset 필수)
+  python scripts/train_blend.py --preset blend14 --xgb-seeds 42 0 1 2 3  # 17 XGB 시드 5개 평균 (LB 미확인)
+  python scripts/train_blend.py --preset select6                         # 16 기록용 (LB 0.3183, 최종 후보 아님)
+  python scripts/train_blend.py --preset blend14 --no-cache              # 최종 제출용 (캐시 무시)
   ```
+  - 프리셋 기준: LB에 실제로 낸 파일 + 최종 후보만 (`blend14` 최종 후보, `select6` 기록용)
+  - 비율은 어느 컴퓨터에서 골랐는지 적고 고정, 제출 파일은 항상 설아님 Windows 데스크탑에서 생성
+  - 모델별 확률은 `submissions/cache/`에 설정 해시(모델 파라미터, src/ 코드, 버전, CPU)를 붙여 저장 → 설정이 같으면 학습 없이 섞기만 함
+  - **최종 제출 파일은 항상 `--no-cache`로 생성**
+  - 최종 제출 조합 확정 후 이 자리에 최종 명령어 1줄 기입 예정
 
 ---
 
