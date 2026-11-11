@@ -128,6 +128,10 @@ def mutation_features(df, gene_cols):
         silent    : 침묵 변이가 1개 이상, 컬럼 = '유전자__silent'
         trunc     : 절단 변이(nonsense, frameshift)가 1개 이상, 컬럼 = '유전자__trunc'
         stats     : 행 단위 요약 (유형별 변이 수 log1p, 변이 유전자 수 log1p, 침묵 변이 비율)
+        ratio     : 행 단위 요약 비율판 (22a) — 유형별 변이 비율(유형 수 / 전체 변이 수) + 전체 변이 수 log1p
+                    · in-frame indel은 분모·열에서 제외 (train 3개 / test 3,501개, 표기 차이 아님 → 22 노트북 확인)
+                    · 변이가 2배여도 같은 암이면 비율은 비슷 → test 변이 수 증가에 덜 흔들리게
+                    · 개수는 전체 변이 수 하나만 log로 남김, 변이 0개 환자는 비율 모두 0
 
     침묵 변이 처리 3가지
         ① 포함 : any                 ← 팀 기본값 (08: ① > ③ 분리 > ② 제외)
@@ -169,10 +173,18 @@ def mutation_features(df, gene_cols):
     stats["n_gene_log"] = np.log1p(X_any.sum(axis=1)).astype(np.float32)
     stats["silent_ratio"] = counts[:, type_idx["silent"]] / np.maximum(counts.sum(axis=1), 1)
 
+    # in-frame indel은 train에 거의 없고(3개) test에만 많음(3,501개) → 분모·열에서 제외 (22 노트북 확인 셀)
+    keep = [k for k, t in enumerate(MUT_TYPES) if t != "inframe_indel"]
+    total = counts[:, keep].sum(axis=1, keepdims=True)
+    ratio = pd.DataFrame(counts[:, keep] / np.maximum(total, 1), index=idx,
+                         columns=[f"r_{MUT_TYPES[k]}" for k in keep])
+    ratio["n_mut_log"] = np.log1p(total[:, 0])
+
     return {
         "any": X_any,
         "nonsilent": pd.DataFrame(nonsilent, index=idx, columns=gene_cols),
         "silent": pd.DataFrame(silent, index=idx, columns=[f"{g}__silent" for g in gene_cols]),
         "trunc": pd.DataFrame(trunc, index=idx, columns=[f"{g}__trunc" for g in gene_cols]),
         "stats": stats.astype(np.float32),
+        "ratio": ratio.astype(np.float32),
     }
