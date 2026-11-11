@@ -17,6 +17,22 @@ TRUNC_TYPES = {"nonsense", "frameshift"}  # 단백질이 잘리는(기능을 잃
 
 _SNV = re.compile(r"([A-Z*])(\d+)([A-Z*])")  # G12D, R895R, R213*, *261*, (R492X)
 
+# 아미노산 성질 그룹 (11/11 회의: 프라탁신 논문 기준 6그룹 + 종결코돈, 도메인 지식이므로 외부 데이터 아님)
+#   근거: Puglisi R. Protein Mutations and Stability, a Link with Disease: The Case Study of Frataxin.
+#         Biomedicines 10(2):425 (2022) — 소수성↔친수성 교체, 전하 변화, 글리신·프롤린 도입을 각각 구조 영향으로 설명
+#   - 시스테인(C)은 논문 설명("a cysteine that is hydrophobic")대로 소수성
+#   - 티로신(Y)은 수산기(-OH)가 있어 친수성 (일반적인 교과서 분류)
+AA_GROUPS = {
+    "hydrophobic": "AVLIMFWC",   # 물을 싫어하는 것
+    "hydrophilic": "STNQY",      # 물을 좋아하는 것 (전하 없음)
+    "positive": "KRH",           # 플러스 전기
+    "negative": "DE",            # 마이너스 전기
+    "glycine": "G",              # 글리신 (가장 작고 유연해서 구조에 특수)
+    "proline": "P",              # 프롤린 (고리 구조라 단단해서 구조를 끊음)
+    "stop": "*",                 # 종결코돈
+}
+AA_GROUP = {aa: g for g, members in AA_GROUPS.items() for aa in members}
+
 
 def to_binary(df, gene_cols):
     """L0 이진화: WT → 0, 그 외(변이 있음) → 1.
@@ -71,6 +87,34 @@ def mutation_type(token):
             return "stop_loss"
         return "missense"
     return "other"
+
+
+def aa_substitution(token):
+    """단일 아미노산 치환 토큰 → '원래>바뀐' 아미노산 문자열. 한 행 안에서만 계산 → 누수 아님.
+
+    침묵·넌센스·stop_loss도 같은 형식으로 돌려줌 (필요하면 mutation_type()으로 걸러서 사용).
+    frameshift, in-frame indel, 여러 아미노산 치환(1529_1530AL>AL)은 None.
+
+    >>> [aa_substitution(t) for t in ['R132H', 'G12D', 'R895R', 'R213*', '*261*', 'K600fs', 'P233del', '1529_1530AL>AL']]
+    ['R>H', 'G>D', 'R>R', 'R>*', '*>*', None, None, None]
+    """
+    m = _SNV.fullmatch(token.replace("X", "*"))   # 정규화 전 데이터의 X 표기도 처리
+    return f"{m.group(1)}>{m.group(3)}" if m else None
+
+
+def aa_group_change(token):
+    """단일 아미노산 치환 토큰 → '원래 그룹>바뀐 그룹' (AA_GROUPS 기준). 치환이 아니면 None.
+
+    >>> [aa_group_change(t) for t in ['R132H', 'G12D', 'E545K', 'V600E', 'L156P', 'R213*', 'K600fs']]
+    ['positive>positive', 'glycine>negative', 'negative>positive', 'hydrophobic>negative', 'hydrophobic>proline', 'positive>stop', None]
+    """
+    sub = aa_substitution(token)
+    if sub is None:
+        return None
+    ref, alt = sub.split(">")
+    if ref not in AA_GROUP or alt not in AA_GROUP:   # 표준 20개 + 종결코돈 외 문자 (안전장치)
+        return None
+    return f"{AA_GROUP[ref]}>{AA_GROUP[alt]}"
 
 
 def mutation_features(df, gene_cols):
