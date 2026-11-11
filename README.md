@@ -169,11 +169,12 @@
   ```bash
   python scripts/train_blend.py --list                                   # 섞기 조합(프리셋) 목록
   python scripts/train_blend.py --preset blend14                         # 14 XGB 0.7 + LR 0.3 (--preset 필수)
-  python scripts/train_blend.py --preset equal3                          # 14 XGB + LR + RF 같은 비율
-  python scripts/train_blend.py --preset blend14 --xgb-seeds 42 0 1 2 3  # 17 XGB 시드 5개 평균
+  python scripts/train_blend.py --preset blend14 --xgb-seeds 42 0 1 2 3  # 17 XGB 시드 5개 평균 (LB 미확인)
+  python scripts/train_blend.py --preset select6                         # 16 기록용 (LB 0.3183, 최종 후보 아님)
   python scripts/train_blend.py --preset blend14 --no-cache              # 최종 제출용 (캐시 무시)
   ```
-  - 프리셋은 노트북 14의 고정 비율 (`blend14`, `equal3`, `equal4`). 16은 LB 확인 후 추가 예정
+  - 프리셋 기준: LB에 실제로 낸 파일 + 최종 후보만 (`blend14` 최종 후보, `select6` 기록용)
+  - 비율은 어느 컴퓨터에서 골랐는지 적고 고정, 제출 파일은 항상 설아님 Windows 데스크탑에서 생성
   - 모델별 확률은 `submissions/cache/`에 설정 해시(모델 파라미터, src/ 코드, 버전, CPU)를 붙여 저장 → 설정이 같으면 학습 없이 섞기만 함
   - **최종 제출 파일은 항상 `--no-cache`로 생성**
   - 최종 제출 조합 확정 후 이 자리에 최종 명령어 1줄 기입 예정
