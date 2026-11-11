@@ -137,8 +137,11 @@ def mutation_features(df, gene_cols):
     trunc는 CV를 올리지만(+0.008) LB 효과는 없었습니다 (07 F).
         → test는 종결코돈을 'X'로 표기해 nonsense가 trunc에서 빠져 있었음 (test trunc 1.37‰ → 수정 후 1.88‰).
           load_data(normalize=True)로 고친 뒤 LB에서 다시 확인하세요.
-    stats(변이 '개수' 피처)는 사용하지 않는 것을 권장합니다.
-        → test는 정규화 후에도 환자당 변이 수가 train의 약 2배라서(중앙값 14 vs 28) 분포가 어긋납니다.
+    stats(변이 '개수' 피처)는 XGB에서 중요한 피처입니다 (15).
+        → XGB에서 빼면 CV −0.058 (0.4161 → 0.3579), test 예측이 COAD로 쏠림 (22.1%, train 3.6%)
+        → 10 + 정규화(any + stats)는 LB 0.3202로 정규화 전 최고(0.3206)와 비슷 → 지금 기준 모델은 stats 포함
+        단, test는 정규화 후에도 환자당 변이 수가 train의 약 2배라서(중앙값 14 vs 28) '개수'는 분포가 어긋남
+        → 개수 대신 비율로 바꾸는 실험 진행 중 (22)
     """
     V = df[gene_cols].to_numpy()
     n, m = V.shape
