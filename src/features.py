@@ -130,6 +130,7 @@ def mutation_features(df, gene_cols):
         stats     : 행 단위 요약 (유형별 변이 수 log1p, 변이 유전자 수 log1p, 침묵 변이 비율)
         ratio     : 행 단위 요약 비율판 (22a) — 유형별 변이 비율(유형 수 / 전체 변이 수) + 전체 변이 수 log1p
                     · in-frame indel은 분모·열에서 제외 (train 3개 / test 3,501개, 표기 차이 아님 → 22 노트북 확인)
+                      → 11/13 최종 제출에서는 누수 우려로 되돌려 모든 유형 포함 (컬럼에 r_inframe_indel 추가됨)
                     · 변이가 2배여도 같은 암이면 비율은 비슷 → test 변이 수 증가에 덜 흔들리게
                     · 개수는 전체 변이 수 하나만 log로 남김, 변이 0개 환자는 비율 모두 0
 
@@ -175,7 +176,9 @@ def mutation_features(df, gene_cols):
     stats["silent_ratio"] = counts[:, type_idx["silent"]] / np.maximum(counts.sum(axis=1), 1)
 
     # in-frame indel은 train에 거의 없고(3개) test에만 많음(3,501개) → 분모·열에서 제외 (22 노트북 확인 셀)
-    keep = [k for k, t in enumerate(MUT_TYPES) if t != "inframe_indel"]
+    # [11/13 최종 제출] 위 제외 기준은 test 개수를 보고 정한 것이라 누수 우려로 되돌림 → 모든 유형을 분모·열에 포함
+    #   (예전 방식: keep = [k for k, t in enumerate(MUT_TYPES) if t != "inframe_indel"])
+    keep = list(range(len(MUT_TYPES)))
     total = counts[:, keep].sum(axis=1, keepdims=True)
     ratio = pd.DataFrame(counts[:, keep] / np.maximum(total, 1), index=idx,
                          columns=[f"r_{MUT_TYPES[k]}" for k in keep])
