@@ -140,7 +140,8 @@ def mutation_features(df, gene_cols):
 
     trunc는 CV를 올리지만(+0.008) LB 효과는 없었습니다 (07 F).
         → test는 종결코돈을 'X'로 표기해 nonsense가 trunc에서 빠져 있었음 (test trunc 1.37‰ → 수정 후 1.88‰).
-          load_data(normalize=True)로 고친 뒤 LB에서 다시 확인하세요.
+          load_data(normalize=True)로 고친 뒤에는 test에서도 train과 같은 방식으로 계산됨 (20)
+          (변이 칸 중 절단 변이 칸 train 10.2% / test 10.5%, LR과 LR_trunc 예측이 다른 비율 OOF 8.4% / test 8.8%)
     stats(변이 '개수' 피처)는 XGB에서 중요한 피처입니다 (15).
         → XGB에서 빼면 CV −0.058 (0.4161 → 0.3579), test 예측이 COAD로 쏠림 (22.1%, train 3.6%)
         → 10 + 정규화(any + stats)는 LB 0.3202로 정규화 전 최고(0.3206)와 비슷 → 지금 기준 모델은 stats 포함
