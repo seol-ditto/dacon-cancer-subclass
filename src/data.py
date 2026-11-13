@@ -1,14 +1,15 @@
 """데이터 로드와 전처리.
 
-train과 test에 '똑같은 규칙'을 적용합니다. test에서 계산한 값과 test 라벨은 쓰지 않으므로 Data Leakage가 아닙니다.
-(이소폼 번호 선택에 쓰는 '토큰 사전'은 train으로만 만듭니다.)
+train과 test에 '똑같은 규칙'을 적용합니다. test에서 계산한 값과 test 라벨은 쓰지 않습니다.
+11/13 변경: 기본값은 1(빈칸 → WT)과 2(표기 통일)만 적용합니다. 3(이소폼 중복 제거)은 규칙의 근거가
+test의 패턴이라 데이터 누수 우려로 기본값에서 껐습니다 (load_data(dedupe=False)가 기본, 최종 제출 LB 0.3792).
 
 1. 빈칸('') → 'WT'  (test에만 237칸, 01 EDA 2))
 2. 변이 표기 통일 (HGVS 표준 표기법 기준, 01 EDA 3)-3, 3)-4)
    - 정지코돈 'X' → '*' (토큰 안 모든 X)  예) R492X → R492*, X541X → *541*, X127C → *127C
      'X'는 예전 표기로 '*'와 같은 뜻. train에는 X가 한 글자도 없어 train 결과는 그대로입니다.
    - frameshift 뒤 아미노산 제거          예) K600Nfs → K600fs
-3. 이소폼 중복 제거 (01 EDA 3)-5)
+3. 이소폼 중복 제거 (01 EDA 3)-5) — 11/13부터 기본값에서 끔 (dedupe=True일 때만 적용)
    - 한 칸 안에서 위치 번호만 다르고 변이 내용(ref/alt)이 같은 토큰은 1개만 남깁니다.
      예) TP53 'R141H R114H R234H R273H' → 'R273H'  (같은 변이를 이소폼별 번호로 여러 번 적은 것)
    - 근거: test에서 한 칸 안 위치 차이 패턴이 유전자마다 수백 명에게 똑같이 반복됩니다.
@@ -24,6 +25,9 @@ train과 test에 '똑같은 규칙'을 적용합니다. test에서 계산한 값
        패턴 없이 흩어져 있음. 유전자 단위 있음/없음·유형 피처는 그대로이고 '개수'만 조금 줄어듭니다.
      · fs는 키가 (ref, 'fs')라 같은 아미노산의 서로 다른 fs(K600fs, K120fs)도 합쳐짐 (train 10여 칸)
      · E746_A750del처럼 번호가 두 개인 토큰은 두 번째 번호가 키에 남아, 이소폼이어도 합쳐지지 않음
+   - 11/13 변경: 위 근거가 test의 패턴이라, 운영진 데이터 누수 공지("전처리 기준을 만들 때 test를 먼저
+     보는 것은 허용되지 않음") 기준으로 기본값을 dedupe=False로 바꿈. 끈 버전이 LB 0.3660 → 0.3792로 더 높음
+     (22 노트북 v2). 11/12 이전 노트북 결과를 그대로 재현하려면 load_data(dedupe=True)로 불러야 함
 """
 import re
 from collections import defaultdict
@@ -43,7 +47,7 @@ _FS_AA = re.compile(r"^([A-Z*]*\d+)[A-Z]?fs.*$")   # K600Nfs, K600Nfs*12
 _POS = re.compile(r"^([A-Z*]?)(\d+)(.*)$")         # (ref)(위치)(나머지)
 
 
-def load_data(normalize=True, dedupe=True):
+def load_data(normalize=True, dedupe=False):
     """train, test, sample_submission을 불러와 전처리를 적용해 반환합니다.
 
     Parameters
@@ -52,9 +56,10 @@ def load_data(normalize=True, dedupe=True):
         True(기본)면 변이 표기 통일(X → *, fs 뒤 아미노산 제거)을 train/test 모두에 적용합니다.
         False는 예전 방식과 비교할 때만 사용하세요.
     dedupe : bool
-        True(기본)면 이소폼 중복 제거도 적용합니다 (normalize=True일 때만 의미 있음).
-        - stats(변이 '개수')를 쓰는 모델 → True 권장: test 개수가 이소폼 중복으로 부풀려진 것을 바로잡음
-        - 토큰 단위 핫스팟(11)을 쓰는 모델 → False 권장
+        False(기본, 11/13 변경)면 이소폼 중복 제거 없이 표기 통일만 합니다.
+        True면 이소폼 중복 제거도 적용합니다 (normalize=True일 때만 의미 있음). 11/12 이전 결과 재현용.
+        - 규칙의 근거가 test의 패턴이라 데이터 누수 우려로 기본값에서 끔 (위 모듈 설명 3 참고)
+        - 참고(11/12 이전 기록): 토큰 단위 핫스팟(11)을 쓰는 모델은 원래 False를 권장했음
           · 환자별 토큰을 set으로 모으면 기본 이소폼 번호(R273H 등)가 이미 들어 있어 중복 제거가 필요 없음
           · train에서는 '진짜 다른 변이'가 합쳐져 핫스팟 후보가 사라짐
             (10명 이상 후보 120 → 116개: LRIG1_L24V, PLEC_A2106A, APC_R876*, PIK3CA_E453K)
